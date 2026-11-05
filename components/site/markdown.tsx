@@ -82,8 +82,9 @@ export function Markdown({ blocks }: { blocks: Block[] }) {
         }
 
         if (block.type === 'list') {
+          const ListTag = block.ordered ? 'ol' : 'ul'
           return (
-            <ul key={index} className="flex max-w-[72ch] flex-col gap-3">
+            <ListTag key={index} className="flex max-w-[72ch] list-none flex-col gap-3">
               {block.items.map((item, itemIndex) => (
                 <li
                   key={itemIndex}
@@ -97,7 +98,7 @@ export function Markdown({ blocks }: { blocks: Block[] }) {
                   <InlineRun content={item} />
                 </li>
               ))}
-            </ul>
+            </ListTag>
           )
         }
 

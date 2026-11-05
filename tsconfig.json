@@ -1,0 +1,63 @@
+{
+  "compilerOptions": {
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "esnext"
+    ],
+    "allowJs": true,
+    "target": "ES2017",
+    "skipLibCheck": true,
+    "strict": true,
+    "noEmit": true,
+    "esModuleInterop": true,
+    "module": "esnext",
+    "moduleResolution": "bundler",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "jsx": "react-jsx",
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ],
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "./*"
+      ],
+      "@/lib/quests/pogo-types": [
+        "./stubs/pogo-types.ts"
+      ],
+      "@/lib/stats": [
+        "./stubs/stats.ts"
+      ],
+      "@pogoleiria/ui": [
+        "./vendor/pogoleiria/packages/ui/src/index.ts"
+      ],
+      "@pogoleiria/ui/*": [
+        "./vendor/pogoleiria/packages/ui/*"
+      ],
+      "@vendor/domain-colors": [
+        "./vendor/pogoleiria/apps/landing/lib/domain-colors.ts"
+      ],
+      "@vendor/team-colors": [
+        "./vendor/pogoleiria/apps/landing/lib/team-colors.ts"
+      ]
+    }
+  },
+  "include": [
+    "next-env.d.ts",
+    "**/*.ts",
+    "**/*.tsx",
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts",
+    "vendor/pogoleiria/packages/ui/src/**/*.ts",
+    "vendor/pogoleiria/packages/ui/src/**/*.tsx"
+  ],
+  "exclude": [
+    "node_modules",
+    "vendor/pogoleiria/packages/ui/tests"
+  ]
+}

@@ -1,0 +1,54 @@
+@import 'tailwindcss';
+@import 'tw-animate-css';
+/* The vendored token file, imported by relative path so the vendored package
+ * never has to be installed from npm (its devDependencies are private to the
+ * monorepo). */
+@import '../vendor/pogoleiria/packages/ui/src/tokens.css';
+
+/* The design site is its own first consumer: these are the same package
+ * sources the site documents. */
+@source '../app';
+@source '../components';
+@source '../lib';
+@source '../vendor/pogoleiria/packages/ui/src';
+
+@layer base {
+  html {
+    background: var(--background);
+  }
+
+  body {
+    background: var(--background);
+    color: var(--foreground);
+    @apply font-sans antialiased;
+  }
+
+  ::selection {
+    background: var(--primary);
+    color: var(--primary-foreground);
+  }
+
+  * {
+    scrollbar-width: thin;
+    scrollbar-color: var(--color-hairline-strong) transparent;
+  }
+
+  /* One focus treatment, from DESIGN.md: outline-ember-bright. SearchField
+   * draws its own frame-level ring, so its inner input is left out. */
+  :where(a, button, summary, [role='button'], [role='tab'], input, select, textarea):where(:not([data-slot='search-field'] *)):focus-visible {
+    outline: 2px solid var(--color-ember-bright);
+    outline-offset: 2px;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

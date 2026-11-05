@@ -1,0 +1,639 @@
+:root {
+  color-scheme: dark;
+
+  /* Primitive palette: keep these private to the theme layer. Components use
+   * semantic roles below so a future app can re-theme without rewrites.
+   *
+   * The neutrals are spaced for a phone held outdoors. Page-to-panel used to
+   * be a 0.04 step in L, which daylight erases, leaving a black drop shadow to
+   * imply the edge — the one thing sunlight erases first. It's 0.08 now, and
+   * the hairline sits far enough above the panel to be a real line. */
+  --tone-975: oklch(0.068 0.018 258);
+  --tone-950: oklch(0.105 0.022 258);
+  --tone-900: oklch(0.185 0.024 258);
+  --tone-850: oklch(0.235 0.026 258);
+  --tone-800: oklch(0.3 0.026 258);
+  --tone-700: oklch(0.42 0.03 258);
+  --tone-500: oklch(0.6 0.026 258);
+  --tone-300: oklch(0.755 0.022 258);
+  --tone-200: oklch(0.885 0.016 258);
+  --tone-100: oklch(0.97 0.01 258);
+  /* Ember, not blue. Same L as before so white-on-fill stays at 4.97:1;
+   * chroma lifted so a filled control reads as deliberate, not muddy. */
+  --brand-600: oklch(0.52 0.17 28);
+  --brand-400: oklch(0.66 0.16 30);
+  --brand-800: oklch(0.34 0.12 28);
+  /* Signal gold at chroma 0.025 was warm white, a hair off --foreground: a
+   * reward and a paragraph rendered as the same colour. */
+  --signal-300: oklch(0.86 0.13 88);
+  --signal-500: oklch(0.7 0.11 86);
+  --danger-500: oklch(0.62 0.2 28);
+  --success-400: oklch(0.76 0.15 155);
+  /* Urgent: this runs out soon. Hue 58 is chosen, not picked — it is the one
+   * warm hue exactly 30° from both signals it has to live beside, ember at 30
+   * and gold at 88, so it can't be mistaken for either at a glance or at 10px.
+   * It is not danger: danger is hue 28 at L 0.62, the same red family as ember
+   * and two lightness steps down, while this is an orange bright enough to
+   * read as a clock rather than a fault. Chroma 0.165 against a 0.179 sRGB
+   * ceiling at this lightness, so it survives the trip through a phone's
+   * display profile without clipping. 8.82:1 on --background and 8.01:1 on
+   * --color-surface-raised: AAA on both, because it is read outdoors. */
+  --urgent-500: oklch(0.75 0.165 58);
+
+  /* Semantic roles. This is the public contract for app surfaces. */
+  --background: var(--tone-950);
+  --foreground: var(--tone-100);
+  --card: var(--tone-900);
+  --card-foreground: var(--tone-100);
+  --popover: var(--tone-900);
+  --popover-foreground: var(--tone-100);
+  --primary: var(--brand-600);
+  --primary-foreground: var(--tone-100);
+  --secondary: var(--tone-850);
+  --secondary-foreground: var(--tone-100);
+  --muted: var(--tone-850);
+  --muted-foreground: var(--tone-300);
+  --accent: var(--signal-300);
+  --accent-foreground: var(--tone-950);
+  --destructive: var(--danger-500);
+  --destructive-foreground: var(--tone-100);
+  /* Fresh, live, current: a dot saying data is up to date. It used to be a raw
+   * oklch literal in the hub's LiveDot, the private --success-400 with no role
+   * to hold it. Not a reward (gold) and not a warning (urgent). */
+  --success: var(--success-400);
+  /* Time running out, not something wrong. destructive is for what you can't
+   * undo and what won't validate; this is for a countdown that has reached
+   * its last day, its last hour, its last few minutes. */
+  --urgent: var(--urgent-500);
+  --border: var(--tone-800);
+  --input: var(--tone-850);
+  --ring: var(--brand-400);
+
+  /* Radius. Every step is declared: --radius-2xl used to be left undefined,
+   * so `rounded-2xl` fell through to Tailwind's 16px and landed *below*
+   * `rounded-xl` at 18px — cards were less round than the buttons inside
+   * them. Controls now sit one step tighter than the surface holding them. */
+  --radius: 1rem;
+  --radius-step-sm: 8px;
+  --radius-step-md: 12px;
+  --radius-step-lg: 16px;
+  --radius-step-xl: 20px;
+  --radius-step-2xl: 24px;
+
+  /* Layout and interaction primitives. */
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-6: 1.5rem;
+  --space-8: 2rem;
+  --control-min: 2.75rem;
+  --motion-standard: 180ms cubic-bezier(0.16, 1, 0.3, 1);
+  --motion-slow: 320ms cubic-bezier(0.16, 1, 0.3, 1);
+  /* One shadow, for the things that genuinely float above the page: the
+   * bottom switcher and popovers. A quest screen used to stack four
+   * different shadows plus a sheen; shadow is how a surface says "I'm above
+   * you", and when everything says it nobody hears it. Panels and rows get
+   * their edge from --border and the lightness step instead. */
+  --shadow-float: 0 14px 34px oklch(0.02 0.01 258 / 0.66);
+}
+
+
+@theme inline {
+  /* Holofote (2026-09-23): Figtree for reading, Bricolage Grotesque for the
+   * display face: headings and figures. Inter and Space Grotesk were the
+   * suite's most generic choice. Pair figures with `tabular-nums`. */
+  --font-sans: var(--font-figtree, 'Figtree'), system-ui, sans-serif;
+  --font-display: var(--font-bricolage, 'Bricolage Grotesque'), system-ui, sans-serif;
+  --font-mono: var(--font-bricolage, 'Bricolage Grotesque'), monospace;
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --color-card: var(--card);
+  --color-card-foreground: var(--card-foreground);
+  --color-popover: var(--popover);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-primary: var(--primary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-secondary: var(--secondary);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-muted: var(--muted);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-accent: var(--accent);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-destructive: var(--destructive);
+  --color-destructive-foreground: var(--destructive-foreground);
+  --color-success: var(--success);
+  --color-urgent: var(--urgent);
+  --color-border: var(--border);
+  --color-input: var(--input);
+  --color-ring: var(--ring);
+  --radius-sm: var(--radius-step-sm);
+  --radius-md: var(--radius-step-md);
+  --radius-lg: var(--radius-step-lg);
+  --radius-xl: var(--radius-step-xl);
+  --radius-2xl: var(--radius-step-2xl);
+}
+
+/*
+ * The craft palette.
+ *
+ * Compatibility aliases for the current product language. New components
+ * should prefer semantic roles above; these names make app migration gradual.
+ */
+@theme {
+  /* Three surfaces, not five. surface-card and surface-raised held the same
+   * value under two names; surface-elevated and surface-hover sat inside one
+   * 0.05 band and surface-hover was also the hairline. Hover is a hairline
+   * change plus one step, not a fill of its own. */
+  --color-surface-pill: var(--tone-950);
+  --color-surface-sunken: var(--tone-975);
+  --color-surface-raised: var(--tone-900);
+  --color-surface-card: var(--tone-900);
+  --color-surface-elevated: var(--tone-850);
+  --color-surface-hover: var(--tone-850);
+
+  --color-hairline: var(--tone-800);
+  --color-hairline-strong: var(--tone-700);
+  --color-hairline-hover: var(--tone-500);
+  --color-hairline-active: var(--tone-300);
+  --color-control-border: var(--tone-500);
+
+  --color-ink-subtle: var(--tone-500);
+  --color-ink-muted: var(--tone-300);
+  --color-ink-label: var(--tone-200);
+  --color-ink-hover: var(--tone-100);
+  --color-ink-bright: var(--tone-100);
+  --color-ink-strong: var(--tone-100);
+
+  /* Gold marks a reward or progress toward one. Nothing else — it used to
+   * mark the pokéstop figure and every count badge as well, and three
+   * meanings is no meaning. Counts are ink-label, figures are ink-bright. */
+  --color-gold: var(--signal-300);
+  --color-gold-dim: var(--signal-500);
+
+  /* Ember: what you touch. Named `blue` until now, while resolving to a brick
+   * red — and `blue-glow` to a salmon, and `cyan` to a pale cream. DESIGN.md
+   * promised "a restrained electric-blue interaction colour" the tokens
+   * never delivered. The red is the brand; the names were the bug.
+   *
+   * Note these sit alongside Tailwind's own numbered blue and amber scales,
+   * which several components still use for banners. `bg-ember` is ours;
+   * `text-blue-300` is Tailwind's. */
+  --color-ember: var(--brand-600);
+  --color-ember-deep: var(--brand-800);
+  --color-ember-bright: var(--brand-400);
+
+  /* Discord's own purple (#5865F2), for the one thing that opens Discord: a
+   * trainer's message button, its mark alone and no words (owner,
+   * 2026-10-11). In ember, a list of trainers was a column of red buttons,
+   * and red is this suite's colour for a control of its own. Never a text
+   * colour, never decoration. */
+  --color-discord: oklch(0.577 0.209 273.9);
+  --color-discord-deep: oklch(0.5 0.2 273.9);
+  --color-discord-bright: oklch(0.74 0.14 273.9);
+
+  --spacing-control: var(--control-min);
+  --animate-enter: enter var(--motion-slow);
+}
+
+@keyframes enter {
+  from { opacity: 0; transform: translateY(0.5rem); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@layer base {
+  *, *::before, *::after { border-color: var(--border); }
+  html { background: var(--background); }
+  body { background: var(--background); color: var(--foreground); }
+  ::selection { background: var(--primary); color: var(--primary-foreground); }
+  :where(button, a, input, select, textarea, [role='button'], [role='tab']) {
+    -webkit-tap-highlight-color: transparent;
+  }
+  :where(button, [role='button'], [role='tab']) { min-height: var(--control-min); }
+  /* Scrollbars, where a desktop draws them: thin and in the palette. A
+     grey system bar beside a dark panel read as a second, foreign surface,
+     and several containers used overflow-y-scroll, which drew one even with
+     nothing to scroll; those are overflow-y-auto now. */
+  * { scrollbar-width: thin; scrollbar-color: var(--color-hairline-strong) transparent; }
+  /* The pressed state. The tap highlight above is off everywhere and hover
+     never fires on a phone, so a tap used to change nothing on screen until
+     whatever it opened arrived. A brief brightening of the thing under the
+     finger, on every control, without touching layout. */
+  :where(button, a[href], summary, [role='button'], [role='tab']):where(:active):where(:not(:disabled, [aria-disabled='true'])) {
+    filter: brightness(1.25);
+  }
+}
+
+/*
+ * Shared gradients.
+ *
+ * These four were repeated as arbitrary values across both apps (the card
+ * gradient seven times, the header gradient four). Leaving them as literals
+ * after tokenising the flat colours would have been the worst of both worlds:
+ * changing --color-surface-card would have updated every flat use and silently
+ * desynced the gradients built from the same colour.
+ *
+ * gradient-active and gradient-active used to run opposite ways —
+ * zone-selector bright-to-dark, the pill tabs dark-to-bright — and the call
+ * between them was left open. It's settled here: one direction, one name, and
+ * the reversed alias is gone.
+ *
+ * gradient-card is much shallower than it was. Falling the whole way from the
+ * panel surface to the sunken one is a 0.117 step in L now that the surfaces
+ * are properly spaced, which read as a vignette rather than a surface.
+ */
+@theme {
+  --background-image-gradient-card: linear-gradient(
+    160deg,
+    var(--color-surface-raised) 0%,
+    color-mix(in oklch, var(--color-surface-raised) 76%, var(--color-surface-sunken)) 100%
+  );
+  --background-image-gradient-header: linear-gradient(160deg, var(--color-surface-elevated) 0%, var(--color-surface-raised) 100%);
+  --background-image-gradient-active: linear-gradient(135deg, var(--color-ember-deep) 0%, var(--color-ember) 100%);
+}
+
+/*
+ * Visible focus also covers app-specific buttons built on the shared shell.
+ *
+ * SearchField is left out and draws its own focus. Its wrapper is the visible
+ * field while the input is a borderless strip inset past the search icon, so
+ * outlining the input drew a second, smaller box inside the field, and the
+ * 2px offset pushed the clear button's circle out through the field's edge.
+ * This rule is unlayered, which means it beats every Tailwind utility
+ * regardless of specificity: the component's own `outline-none` could never
+ * switch it off, so the exclusion has to live here. The second :where keeps
+ * the rule's specificity where it was.
+ */
+[data-slot="app-shell"] :where(button, a, input, [role="button"], [role="tab"]):where(:not([data-slot="search-field"] *)):focus-visible {
+  outline: 2px solid var(--color-ember-bright);
+  outline-offset: 2px;
+}
+
+/* Includes the inline, staggered card animations used by both apps. */
+@media (prefers-reduced-motion: reduce) {
+  [data-slot="app-shell"] *,
+  [data-slot="app-shell"] *::before,
+  [data-slot="app-shell"] *::after {
+    animation-duration: 0.01ms !important;
+    animation-delay: 0ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/*
+ * The suite's type scale. It started as the hub's; Quests and Trades use it too.
+ *
+ * The hub had grown 17 distinct sizes across 63 call sites, including four
+ * pairs that differ by half a pixel — 10/10.5, 11/11.5, 12/12.5, 18/19. Half a
+ * pixel is not a hierarchy step, it is drift, and it is what separates a scale
+ * that was designed from one that accumulated.
+ *
+ * Seven steps, roughly 1.1-1.2 apart until the hero, which takes the one big
+ * jump because it is the number the page exists to show. Where a size steps up
+ * at lg it steps to the next token, rather than to a new invented value.
+ *
+ * Tokens rather than a convention, so the next size added has to either be one
+ * of these or be a deliberate argument for an eighth.
+ */
+@theme {
+  --text-micro: 10px;   /* ambient section labels, tier sublabels */
+  --text-label: 11px;   /* live section labels, figures beside them */
+  --text-body: 13px;    /* names, copy, anything read as a sentence */
+  --text-tier: 15px;    /* raid tier labels, emphasis inside a row */
+  --text-title: 17px;   /* the map card's name */
+  --text-figure: 19px;  /* section figures: Rocket counts, the day's numbers */
+  --text-figure-lg: 22px;
+  --text-hero: 44px;    /* the live Pokémon count, and nothing else */
+  --text-hero-lg: 56px;
+}
+
+/*
+ * Disclosures ease open instead of snapping: the hub's raid tiers, "Mais n"
+ * events and lures, the Pokédex's Categorias. Native <details>, so this is
+ * CSS alone. Opacity and a short slide, not height: layout is not animated.
+ * Where ::details-content is unsupported it stays instant, as it was. Off
+ * under reduced motion.
+ */
+@keyframes disclose {
+  from { opacity: 0; transform: translateY(-4px); }
+  to { opacity: 1; transform: none; }
+}
+@media (prefers-reduced-motion: no-preference) {
+  details[open]::details-content {
+    animation: disclose 180ms cubic-bezier(0.25, 1, 0.5, 1);
+  }
+}
+
+/*
+ * Holofote washes: a glow of a Pokémon's type colour behind its art. The
+ * element sets `--wash` to an RGB triplet (@pogoleiria/pokemon's washFor());
+ * the classes set how the glow falls.
+ *
+ * .wash-tile  a sprite's own square: the glow centred under it.
+ * .wash-hero  a lead panel: the glow off to the right, where the art sits,
+ *             fading into the raised surface so text on the left stays legible.
+ */
+.wash-tile {
+  background: radial-gradient(circle at 50% 55%, rgb(var(--wash) / 0.55), rgb(var(--wash) / 0.08) 70%);
+}
+/* The art a size larger than its tile and standing out of the top: the map
+ * pin's silhouette (reward-pin.css: a 45px disc, 53px art) on a list row. */
+.wash-tile--out { position: relative; }
+.wash-tile--out > img {
+  position: absolute;
+  bottom: 1px;
+  left: 50%;
+  width: 132%;
+  height: 132%;
+  max-width: none;
+  object-fit: contain;
+  transform: translateX(-50%);
+  filter: drop-shadow(0 3px 3px oklch(0.1 0.01 265 / 0.45));
+}
+/* Quest rewards echo the map's dark disc and pale outline. Only Pokémon
+   break out; a reserved 74px slot keeps the entire image inside its row. */
+.quest-reward-tile {
+  border: 2px solid color-mix(in oklab, var(--color-ink-muted) 65%, transparent);
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 50% 55%, rgb(var(--wash, 150 160 180) / 0.24), transparent 75%),
+    var(--color-surface-raised);
+  box-shadow: 0 0 0 1px var(--color-surface-raised);
+}
+.quest-reward-tile.wash-tile--out > img {
+  width: 74px;
+  height: 74px;
+  filter: drop-shadow(0 0 1px color-mix(in oklab, var(--color-ink-muted) 65%, transparent)) drop-shadow(0 2px 2px oklch(0.1 0.01 265 / 0.45));
+}
+/* In the Pokédex's long list one soft shadow, not two filters per sprite:
+   thirty of them at once made opening a generation stutter on a phone. */
+.quest-reward-tile--lean.wash-tile--out > img {
+  filter: drop-shadow(0 2px 2px oklch(0.1 0.01 265 / 0.45));
+}
+.wash-hero {
+  background:
+    radial-gradient(120% 90% at 78% 30%, rgb(var(--wash) / 0.5), rgb(var(--wash) / 0.07) 55%, transparent 75%),
+    var(--color-surface-raised);
+}
+
+/*
+ * Each tool's accent (Holofote): the switcher's current item takes its tool's
+ * colour, so where you are reads before the label does. Only there: buttons,
+ * chips and focus rings stay ember, the colour of what you touch.
+ */
+@theme {
+  --color-tool-home: var(--color-gold);
+  --color-tool-map: oklch(0.78 0.12 185);
+  --color-tool-quests: oklch(0.72 0.13 232);
+  --color-tool-pokedex: var(--color-ember-bright);
+}
+
+/*
+ * A panel's top edge, catching the light.
+ *
+ * DESIGN.md's rule is that surfaces separate by light rather than shadow, and
+ * the hub (and then Trades) obeyed the negative half of it — no drop shadows anywhere — without
+ * ever doing the positive half. Every panel was the same flat fill inside the
+ * same hairline, six times down the page, so the page read as printed rather
+ * than built.
+ *
+ * This is not a shadow and does not compete with --shadow-float, which stays
+ * the only one and stays on things that genuinely float. It is a 1px inset
+ * highlight along the top edge: the same idiom tab-pill already uses, at the
+ * weight a dark panel wants rather than the one an ember fill wants.
+ */
+/*
+ * What a dock button opens (filters): a panel sitting on the dock, inside its
+ * area, so it is in the thumb's reach too. It floats, like the dock.
+ */
+.dock-panel {
+  pointer-events: auto;
+  display: flex;
+  max-height: 60vh;
+  flex-direction: column;
+  gap: 0.75rem;
+  overflow-y: auto;
+  padding: 0.875rem;
+  border: 1px solid var(--color-hairline-strong);
+  border-radius: 1.25rem;
+  background: var(--color-surface-elevated);
+  box-shadow: var(--shadow-float), inset 0 1px 0 oklch(1 0 0 / 0.07);
+}
+
+/*
+ * The brand behind a page's header (PageHeader), on phones: the large
+ * mark, upright and cropped at the screen's top right, at 18% with a soft
+ * fade toward the left. The app
+ * names the file in --brand-mark, and without one nothing is drawn.
+ */
+.page-brand {
+  --page-top: max(0.75rem, env(safe-area-inset-top));
+  position: absolute;
+  inset: calc(-1 * var(--page-top)) 0 0;
+  z-index: -1;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+@media (min-width: 64rem) {
+  .page-brand { display: none; }
+}
+
+.page-brand::before {
+  content: "";
+  position: absolute;
+  top: -3.25rem;
+  right: -4.25rem;
+  width: 18.75rem;
+  height: 18.75rem;
+  background: var(--brand-mark, none) center / contain no-repeat;
+  opacity: 0.18;
+  -webkit-mask-image: linear-gradient(270deg, black 40%, transparent 100%);
+  mask-image: linear-gradient(270deg, black 40%, transparent 100%);
+  transform: none;
+}
+
+/* The owner-selected header badge: a shared angle and outline, with the
+   artwork upright. Every loading/fallback state reserves the same 60px. */
+.header-badge {
+  position: relative;
+  display: flex;
+  width: 60px;
+  height: 60px;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: center;
+  border-radius: var(--radius-lg);
+  background: var(--color-surface-raised);
+  box-shadow: 0 0 0 2px color-mix(in oklab, var(--color-gold) 80%, transparent);
+  transform: rotate(-6deg);
+}
+.header-badge--active {
+  box-shadow: 0 0 0 2px var(--color-ember-bright);
+}
+.header-badge-avatar,
+.header-badge-avatar > img {
+  border-radius: inherit;
+}
+.header-badge-avatar { box-shadow: none; }
+.header-badge-avatar > img { transform: rotate(6deg) scale(1.12); }
+.header-badge--quest > img {
+  width: 74px;
+  height: 74px;
+  max-width: none;
+  transform: rotate(6deg);
+  filter: drop-shadow(0 2px 2px oklch(0.1 0.01 265 / 0.4));
+}
+
+/* Match the Pokédex: title/meta (60px), progress slot (18px), top/bottom
+   padding (4px/12px), and the 1px divider. */
+@media (width < 64rem) {
+  .page-header {
+    height: calc(5.875rem + 1px);
+    padding-top: 0.25rem;
+    padding-bottom: 0.75rem;
+    border-bottom: 1px solid var(--color-hairline);
+  }
+
+  .page-header--prominent h1 {
+    font-size: 2.25rem;
+    font-weight: 900;
+    line-height: 1.05;
+    letter-spacing: -0.04em;
+  }
+
+  /* The selected single-line A wordmark: white uppercase, tight, upright (the tilt was dropped 2026-10-13). */
+  .page-header--wordmark h1 {
+    overflow: visible;
+    font-family: var(--font-sans);
+    font-size: 2.25rem;
+    font-weight: 900;
+    letter-spacing: -0.055em;
+    line-height: 1;
+    text-transform: uppercase;
+  }
+  .page-header--wordmark h1 > span {
+    display: inline-block;
+    white-space: nowrap;
+    transform-origin: left center;
+    transform: scaleX(0.92);
+  }
+}
+
+.lit {
+  box-shadow: inset 0 1px 0 oklch(1 0 0 / 0.07);
+}
+
+/* Joined controls share the owner's B shape: level labels and an 8° seam.
+ * Masks slope the fill alone, so links, tap targets and focus stay rectangular.
+ * Oversized masks put their centre at the cell edge at any height; long labels
+ * can wrap without changing the angle. Row ends keep their rounded caps. */
+.segmented-control {
+  --segmented-angle: 8deg;
+  --segmented-padding: 4px;
+  --segmented-fill-inset: 0px;
+  --segmented-background: var(--color-surface-raised);
+  display: flex;
+  gap: 0;
+  border-radius: 999px;
+  padding: var(--segmented-padding);
+  background: var(--segmented-background);
+}
+.segmented-control[data-layout="grid"] {
+  display: grid;
+  grid-template-columns: repeat(var(--segmented-columns), minmax(0, 1fr));
+  row-gap: 4px;
+}
+.segmented-control[data-wrapped] { border-radius: var(--radius-2xl); }
+.segmented-control--flush { --segmented-padding: 0px; }
+.segmented-control--compact {
+  --segmented-padding: 0px;
+  --segmented-fill-inset: 4px;
+  --segmented-background: transparent;
+}
+.segmented-control > * {
+  position: relative;
+  isolation: isolate;
+  flex: 1 1 auto;
+  min-width: 0;
+  min-height: var(--control-min);
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
+  scale: 1;
+}
+/* The slanted edges are gradient masks: a hard stop is drawn without
+ * anti-aliasing and reads as jagged on the ember fill, so each stop is
+ * feathered over 1px. */
+.segmented-control > *::before {
+  content: "";
+  position: absolute;
+  inset: var(--segmented-fill-inset) -1rem;
+  z-index: -1;
+  background: var(--primary);
+  opacity: 0;
+  pointer-events: none;
+  mask-image:
+    linear-gradient(calc(90deg + var(--segmented-angle)), transparent calc(50% - 0.5px), black calc(50% + 0.5px)),
+    linear-gradient(calc(90deg + var(--segmented-angle)), black calc(50% - 0.5px), transparent calc(50% + 0.5px));
+  mask-size: calc(200% - 2rem) 100%;
+  mask-position: right, left;
+  mask-repeat: no-repeat;
+  mask-composite: intersect;
+  transition: opacity 150ms ease-out;
+}
+.segmented-control > [data-segment-start]::before {
+  left: 0;
+  border-radius: 999px 0 0 999px;
+  mask-image: linear-gradient(calc(90deg + var(--segmented-angle)), black calc(50% - 0.5px), transparent calc(50% + 0.5px));
+  mask-position: left;
+}
+.segmented-control > [data-segment-end]::before {
+  right: 0;
+  border-radius: 0 999px 999px 0;
+  mask-image: linear-gradient(calc(90deg + var(--segmented-angle)), transparent calc(50% - 0.5px), black calc(50% + 0.5px));
+  mask-position: right;
+}
+.segmented-control > [data-segment-start][data-segment-end]::before {
+  border-radius: 999px;
+  mask-image: none;
+}
+.segmented-control > :is([aria-current="page"], [aria-pressed="true"], [data-state="active"]) {
+  color: var(--primary-foreground);
+}
+.segmented-control > :is([aria-current="page"], [aria-pressed="true"], [data-state="active"])::before {
+  opacity: 1;
+}
+.segmented-control > :not([data-segment-start])::after {
+  content: "";
+  position: absolute;
+  inset: var(--segmented-fill-inset) auto var(--segmented-fill-inset) -0.5px;
+  z-index: 1;
+  width: 1px;
+  background: var(--color-hairline-strong);
+  transform: rotate(var(--segmented-angle));
+  pointer-events: none;
+}
+/* No divider on either side of the chosen segment: the grey line ran down the
+ * ember fill's slanted edge and read as a border of another colour on the
+ * button (owner, 2026-10-11). The fill's own edge is the join there. */
+.segmented-control > :is([aria-current="page"], [aria-pressed="true"], [data-state="active"])::after,
+.segmented-control > :is([aria-current="page"], [aria-pressed="true"], [data-state="active"]) + *::after {
+  opacity: 0;
+}
+.segmented-control > [data-segment-start] { border-radius: 999px 0 0 999px; }
+.segmented-control > [data-segment-end] { border-radius: 0 999px 999px 0; }
+.segmented-control > [data-segment-start][data-segment-end] { border-radius: 999px; }
+.segmented-control > *:focus-visible {
+  z-index: 2;
+  outline: 2px solid var(--color-ember-bright);
+  outline-offset: -2px;
+  box-shadow: none;
+}
+@media (prefers-reduced-motion: reduce) {
+  .segmented-control > *,
+  .segmented-control > *::before { transition: none; }
+}

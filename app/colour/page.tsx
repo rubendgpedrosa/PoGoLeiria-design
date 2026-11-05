@@ -91,7 +91,7 @@ export default function ColourPage() {
       <Section
         id="reading-the-numbers"
         title="Reading the numbers"
-        intro="The Colour page is also a check on the palette: it computes what a browser will show and what WCAG will measure."
+        intro="The Colour page is also a check on the palette: it computes what a browser will show and what WCAG will measure. The token tables show the ratio only — a surface is not a text colour, and a deliberate 1.10:1 step between surfaces is not a failure — while the checks below grade the signal colours as text."
       >
         <div className="grid gap-4 md:grid-cols-2">
           <div className="lit rounded-xl border border-hairline bg-surface-raised p-4">

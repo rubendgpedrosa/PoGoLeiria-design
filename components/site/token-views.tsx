@@ -49,10 +49,10 @@ function ContrastCells({ token, background, card }: { token: Token; background: 
   return (
     <>
       <td className="px-3 py-4">
-        <ContrastValue ratio={contrastOn(token.color, background.color.rgb)} />
+        <ContrastValue ratio={contrastOn(token.color, background.color.rgb)} showGrade={false} />
       </td>
       <td className="px-3 py-4">
-        <ContrastValue ratio={contrastOn(token.color, card.color.rgb)} />
+        <ContrastValue ratio={contrastOn(token.color, card.color.rgb)} showGrade={false} />
       </td>
     </>
   )
@@ -149,11 +149,11 @@ export function SemanticRoleCards({
             <div className="flex flex-wrap items-center gap-x-6 gap-y-2 border-t border-hairline pt-3">
               <div>
                 <p className="text-micro font-bold uppercase tracking-[0.12em] text-ink-subtle">On background</p>
-                <ContrastValue ratio={contrastOn(color, background.color.rgb)} />
+                <ContrastValue ratio={contrastOn(color, background.color.rgb)} showGrade={false} />
               </div>
               <div>
                 <p className="text-micro font-bold uppercase tracking-[0.12em] text-ink-subtle">On card</p>
-                <ContrastValue ratio={contrastOn(color, card.color.rgb)} />
+                <ContrastValue ratio={contrastOn(color, card.color.rgb)} showGrade={false} />
               </div>
             </div>
 

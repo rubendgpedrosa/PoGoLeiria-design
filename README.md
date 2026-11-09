@@ -45,7 +45,8 @@ apps/landing/lib/domain-colors.ts
 apps/landing/lib/team-colors.ts
 ```
 
-The full commit SHA goes into `vendor/SOURCE`. Re-pin deliberately:
+The full commit SHA goes into `vendor/SOURCE`. Re-pinning needs a checkout of the private
+monorepo, `/root/PoGoLeiria` unless `POGOLEIRIA_REPO` says otherwise. Re-pin deliberately:
 
 ```sh
 scripts/sync-source.sh "$(git -C /root/PoGoLeiria rev-parse HEAD)"

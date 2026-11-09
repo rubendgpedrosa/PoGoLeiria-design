@@ -15,8 +15,8 @@ site changes on the next build. Two guard tests keep that honest: every custom
 property in `tokens.css` must be shown on the Colour/Geometry pages, and every
 value export in `packages/ui/src/index.ts` must have a component page.
 
-This repo is local on the deployment host for now. It has no GitHub remote:
-creating and pushing the private remote is the owner's step.
+The monorepo it pins is private. The vendored copy in `vendor/pogoleiria` is
+everything the build needs, so this repo builds on its own.
 
 ## Quick start
 
@@ -98,6 +98,5 @@ emoji, 44px targets, a visible ember focus ring and `prefers-reduced-motion`.
 The only place a drop shadow appears is the geometry page's demonstration of
 `--shadow-float`, the one shadow the system allows.
 
-Making `design.pogoleiria.pt` public needs an owner decision: a PM2 entry, a
-production build/release directory, a `deploy.sh` change and DNS/ingress. None
-of that is configured here.
+The live site is a production `next start` on port 4090. It is reachable only
+on the home network, not from the internet.
